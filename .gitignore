@@ -1,0 +1,28 @@
+﻿# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Entornos
+.env
+.env.*
+!.env.example
+
+# Secretos
+*.pem
+*.key
+key.json
+kubeconfig
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
