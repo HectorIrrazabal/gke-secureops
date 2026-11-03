@@ -1,0 +1,49 @@
+﻿name: SecureOps IaC Security
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "k8s/**"
+      - "infra/terraform/**"
+      - ".github/workflows/iac-security.yml"
+  pull_request:
+    paths:
+      - "k8s/**"
+      - "infra/terraform/**"
+      - ".github/workflows/iac-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kubernetes-security:
+    name: Scan Kubernetes Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy Kubernetes Configuration Scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: k8s/base
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          format: table
+
+  terraform-security:
+    name: Scan Terraform Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy Terraform Configuration Scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: infra/terraform
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          format: table
