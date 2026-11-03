@@ -25,10 +25,11 @@ jobs:
         run: docker build -t gke-secureops-backend:ci ./apps/backend
 
       - name: Scan vulnerabilities with Trivy
-        uses: aquasecurity/trivy-action@0.36.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: gke-secureops-backend:ci
           format: table
           severity: HIGH,CRITICAL
           vuln-type: os,library
           exit-code: '0'
+
