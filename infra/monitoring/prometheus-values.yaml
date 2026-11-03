@@ -47,3 +47,37 @@ serverFiles:
             annotations:
               summary: "Backend FastAPI con replicas insuficientes"
               description: "El deployment secureops-backend tiene menos replicas disponibles que las deseadas durante 2 minutos."
+
+          - alert: BackendHighCPU
+            expr: |
+              sum by (pod) (
+                rate(container_cpu_usage_seconds_total{
+                  namespace="secureops",
+                  container="backend",
+                  pod=~"secureops-backend-.*"
+                }[5m])
+              ) / 0.05 > 0.8
+            for: 3m
+            labels:
+              severity: warning
+              service: backend
+            annotations:
+              summary: "Consumo elevado de CPU en FastAPI"
+              description: "El pod {{ $labels.pod }} supera el 80% de su CPU solicitada durante 3 minutos."
+
+          - alert: BackendHighMemory
+            expr: |
+              max by (pod) (
+                container_memory_working_set_bytes{
+                  namespace="secureops",
+                  container="backend",
+                  pod=~"secureops-backend-.*"
+                }
+              ) / (256 * 1024 * 1024) > 0.8
+            for: 3m
+            labels:
+              severity: warning
+              service: backend
+            annotations:
+              summary: "Consumo elevado de memoria RAM en FastAPI"
+              description: "Un pod del backend supera el 80% de su limite de memoria durante 3 minutos."
