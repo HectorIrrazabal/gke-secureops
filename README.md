@@ -1,63 +1,72 @@
-﻿# GKE SecureOps
+# ☁️ GKE SecureOps
 
-Secure, Scalable and Automated Kubernetes Platform
-— GKE-Ready Architecture
+**Kubernetes · Cloud Engineering · DevSecOps**
 
-## Objetivo
+Una aplicación real de **gestión de pedidos** que utilizo para demostrar despliegue, escalamiento, persistencia SQL, observabilidad y seguridad en Kubernetes.
 
-Proyecto de portafolio Cloud Engineer enfocado en
-Kubernetes, seguridad, automatización y arquitectura GKE.
+![Dashboard de GKE SecureOps con pedidos e indicadores conectados a PostgreSQL](docs/images/dashboard.png)
 
-## Estado actual
+## 🎯 ¿Qué hace?
 
-Fase 0: entorno Kubernetes local preparado.
+Desde el dashboard se pueden **crear, consultar, actualizar y eliminar pedidos**. Una API REST en FastAPI procesa las solicitudes y guarda los datos en PostgreSQL. El frontend, el backend y la base de datos se ejecutan en **Kubernetes (Kind)**.
 
-## Infraestructura implementada
+```text
+Navegador → Nginx → FastAPI (HPA: 2–5 Pods) → PostgreSQL → PVC
+                       │
+              Monitoreo del clúster
+              Prometheus + Grafana
+```
 
-- Windows 11 + Docker Desktop + WSL2
-- kind v0.33.0
-- Kubernetes v1.37.0
-- Clúster local: gke-secureops
-- Un nodo control-plane
-- CNI: kindnet
-- kubectl v1.34.1
+## 🛠️ Lo que demuestra
 
-## Comprobaciones realizadas
+| Área | Implementación |
+| --- | --- |
+| **Kubernetes** | Deployments, Services, StatefulSet, PVC y HPA |
+| **Backend y datos** | FastAPI, API REST CRUD, PostgreSQL y SQL |
+| **Seguridad** | ServiceAccounts, RBAC, Secrets, NetworkPolicies y contenedores restringidos |
+| **Observabilidad** | Prometheus, Grafana y reglas de alerta |
+| **Automatización** | GitHub Actions: tests, validación Kubernetes y análisis con Trivy |
+| **Google Cloud / IaC** | Terraform para VPC, GKE privado, nodos e IAM (diseño validado) |
 
-- Nodo Kubernetes Ready
-- API Server saludable
-- Pods del sistema Running
-- Componentes del control plane saludables
+## 📸 Evidencia técnica
 
-## Comandos de verificación
+<details>
+<summary><strong>Ver Kubernetes, PostgreSQL, Grafana y CI/CD</strong></summary>
 
-kubectl config current-context
-kubectl get nodes -o wide
-kubectl get pods -A
-kubectl get --raw='/readyz?verbose'
+**Kubernetes y HPA:** Pods en ejecución y escalamiento configurado.
 
-## Seguridad
+![Pods de Kubernetes y Horizontal Pod Autoscaler](docs/images/kubernetes-hpa.png)
 
-NetworkPolicy API disponible.
-Aplicación real de políticas pendiente de pruebas.
+**PostgreSQL:** los siete pedidos del dashboard corresponden a registros consultados con SQL.
 
-## Google Cloud
+![Consulta SQL de pedidos en PostgreSQL](docs/images/postgresql.png)
 
-La implementación actual funciona localmente.
-La arquitectura GKE se diseñará con Terraform
-sin desplegar recursos facturables.
+**Grafana:** réplicas, HPA, CPU y RAM del backend.
 
-## Costos
+![Dashboard de observabilidad en Grafana](docs/images/grafana.png)
 
-Infraestructura cloud utilizada: USD 0.
+**GitHub Actions:** ejecuciones exitosas de los workflows mostradas en la captura.
 
-## Próximas fases
+![Workflows de GitHub Actions](docs/images/github-actions.png)
 
-1. Microservicios y contenedores
-2. Deployments y Services
-3. Gateway API
-4. HPA y estrategias de despliegue
-5. Seguridad y NetworkPolicies
-6. CI/CD
-7. Terraform para GKE
-8. Observabilidad y troubleshooting
+</details>
+
+## 🚀 Probar el dashboard
+
+Con Docker Desktop y el clúster Kind **ya creado y desplegado**:
+
+```powershell
+kubectl get pods -n secureops
+kubectl port-forward -n secureops service/secureops-frontend 8081:8080
+```
+
+Abrir **http://localhost:8081**.
+
+> Para instalar el entorno desde cero se requieren los manifiestos Kubernetes, las imágenes de contenedores y el Secret de PostgreSQL. El `port-forward` solo abre una instalación existente.
+
+## ☁️ ¿Dónde está desplegado?
+
+- **Funcional hoy:** Kind local + PostgreSQL persistente mediante PVC, sin consumo de recursos de pago en GCP.
+- **Preparado para Google Cloud:** infraestructura de GKE descrita en Terraform y manifiestos de adaptación. **GKE no está desplegado**.
+
+**Objetivo:** un proyecto de portafolio reproducible para roles **Cloud Engineer / DevSecOps**, mostrando tanto una aplicación funcional como las prácticas necesarias para operarla.
