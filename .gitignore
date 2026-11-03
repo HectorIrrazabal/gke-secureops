@@ -26,3 +26,5 @@ crash.log
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+**/.terraform/
