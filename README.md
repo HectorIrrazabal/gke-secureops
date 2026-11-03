@@ -1,84 +1,101 @@
-# ☁️ GKE SecureOps
+# ☁️ GKE SecureOps — Kubernetes & Cloud Engineering
 
-**Cloud Engineering · Kubernetes · DevSecOps · Infrastructure as Code**
+**Proyecto de portafolio | Cloud Engineer Junior · Kubernetes · DevOps · Google Cloud (IaC)**
 
-Proyecto de portafolio que implementa una **aplicación de gestión de pedidos** y demuestra cómo desplegarla, protegerla, monitorearla y recuperar sus datos en Kubernetes. Además, incluye una arquitectura objetivo de **Google Kubernetes Engine (GKE)** definida con Terraform.
+Plataforma de gestión de pedidos desplegada sobre **Kubernetes local (Kind)**, diseñada para demostrar habilidades prácticas de **orquestación, redes, seguridad, escalabilidad, observabilidad y automatización**. Incluye una **arquitectura objetivo de GKE privado en Google Cloud**, definida con Terraform y aún no desplegada.
 
-![Dashboard de GKE SecureOps con pedidos e indicadores conectados a PostgreSQL](docs/images/dashboard.png)
+> **Lo que demuestra:** no solo desarrollé una aplicación; también configuré cómo ejecutarla, escalarla, protegerla, monitorearla, probarla y recuperar sus datos.
 
-## 🎯 ¿Qué problema resuelve?
+![Dashboard de pedidos conectado a PostgreSQL](docs/images/dashboard.png)
 
-Permite **crear, consultar, actualizar y eliminar pedidos** mediante un dashboard web. El frontend **Nginx** se comunica con una API **FastAPI**, que almacena los pedidos en **PostgreSQL**. El objetivo técnico es operar esta aplicación con prácticas de escalabilidad, seguridad y automatización, no solo ejecutarla.
+## 🎯 Caso de uso y arquitectura
+
+El sistema permite **crear, consultar, actualizar y eliminar pedidos** desde una interfaz web. Nginx entrega el frontend, FastAPI expone la API REST y PostgreSQL conserva los datos. El foco del proyecto es la **operación de esta carga de trabajo en Kubernetes**.
 
 ```text
-Navegador → Nginx → FastAPI (HPA: 2–5 réplicas) → PostgreSQL → PVC
-                        │
-                 Prometheus + Grafana
+Usuario → Nginx (frontend) → FastAPI (backend, HPA 2–5 Pods)
+                                 │
+                                 ▼
+                          PostgreSQL (StatefulSet)
+                                 │
+                                 ▼
+                          Volumen persistente (PVC)
+
+                 Prometheus + Grafana → Métricas y observabilidad
 ```
 
-## 🛠️ Tecnologías, habilidades y decisiones técnicas
+## 🛠️ Habilidades Cloud / DevOps aplicadas y por qué
 
-| Área / habilidad | ¿Qué implementé? | ¿Por qué? |
+| Área | Tecnologías y prácticas | ¿Qué problema resuelven? |
 | --- | --- | --- |
-| **Contenedores y Kubernetes** | Docker, Kind, Deployments y Services | Empaquetar componentes, administrar Pods y facilitar la comunicación interna entre servicios. |
-| **Escalabilidad y disponibilidad** | HPA (2–5 réplicas), health checks, recursos y Rolling Updates | Ajustar la capacidad según demanda y reducir interrupciones durante actualizaciones. |
-| **Persistencia de datos** | PostgreSQL, StatefulSet y PVC | Conservar pedidos aunque se reinicien o recreen los Pods. |
-| **Seguridad de Kubernetes** | ServiceAccounts, RBAC, Secrets y SecurityContexts restrictivos | Separar identidades, limitar permisos y reducir privilegios de los contenedores. |
-| **Segmentación de red** | NetworkPolicies para frontend y backend | Declarar qué comunicaciones están permitidas; su aplicación efectiva por el CNI aún requiere validación. |
-| **Observabilidad** | Prometheus, Grafana y alertas | Inspeccionar CPU, memoria, réplicas y comportamiento de la aplicación. |
-| **Integración continua y seguridad** | GitHub Actions, Pytest con PostgreSQL temporal y Trivy | Detectar errores funcionales y revisar vulnerabilidades/configuraciones en el repositorio. La entrega automática (CD) está pendiente. |
-| **Backup & Recovery** | Scripts PowerShell, `pg_dump` y `pg_restore` | Recuperar información ante incidentes; se validó una restauración de **7 pedidos** en una base independiente. |
-| **Infraestructura Cloud (IaC)** | Terraform para VPC, subredes, GKE privado e IAM | Definir una arquitectura de Google Cloud versionable y reproducible, sin aprovisionarla todavía. |
+| **Orquestación de contenedores** | Docker, Kubernetes, Kind, Deployments y Services | Ejecutar y comunicar componentes de forma declarativa, sin depender de IPs de Pods. |
+| **Escalabilidad y disponibilidad** | HPA (2–5 réplicas), health checks, recursos de CPU/RAM y Rolling Updates | Ajustar capacidad, detectar fallos y reducir interrupciones durante actualizaciones. |
+| **Persistencia y datos** | PostgreSQL, StatefulSet y PVC | Mantener los pedidos aunque se reinicie un Pod. |
+| **IAM y seguridad de Kubernetes** | ServiceAccounts, RBAC, Secrets y SecurityContexts | Separar identidades, limitar permisos y evitar credenciales dentro del código. |
+| **Networking y segmentación** | Services y NetworkPolicies para frontend/backend | Definir el tráfico permitido entre componentes; falta validar el cumplimiento efectivo por el CNI. |
+| **Observabilidad** | Prometheus, Grafana y reglas de alerta | Consultar métricas de CPU, memoria y réplicas para diagnosticar el sistema. |
+| **Integración continua (CI)** | GitHub Actions, Pytest y PostgreSQL temporal | Detectar errores en cada push, incluyendo operaciones CRUD sobre una base SQL real de prueba. |
+| **Seguridad en pipelines** | Trivy y validación de manifiestos | Revisar vulnerabilidades y configuraciones inseguras antes de desplegar. |
+| **Continuidad operativa** | PowerShell, `pg_dump` y `pg_restore` | Crear respaldos y comprobar la recuperación de datos: **7 pedidos restaurados** en una base separada. |
+| **Infrastructure as Code / GCP** | Terraform para VPC, subredes, GKE privado e IAM | Definir una infraestructura Cloud reproducible y versionada **sin generar recursos facturables todavía**. |
 
-## ☁️ ¿Qué está desplegado realmente?
+## ✅ Evidencia de resultados
 
-- **Kubernetes operativo:** la aplicación se ejecuta localmente en **Kind**, con frontend, backend y PostgreSQL.
-- **GKE en Google Cloud:** existe un **diseño en Terraform**, pero **el clúster no ha sido creado ni desplegado en GCP**. No se atribuye experiencia de operación de GKE en producción a este proyecto.
-- **Acceso público:** el dashboard no tiene una URL pública de demostración; se accede desde el equipo que ejecuta Kind.
-
-## 📸 Evidencia técnica
+- **Aplicación funcional:** frontend, API REST CRUD y PostgreSQL corriendo en Kubernetes local.
+- **Autoescalamiento:** HPA del backend configurado entre **2 y 5 réplicas**.
+- **Pruebas automatizadas:** workflow **FastAPI + PostgreSQL Tests** completado exitosamente en GitHub Actions.
+- **Recuperación:** respaldo y restauración probados con **7 pedidos**, sin modificar la base original.
+- **Observabilidad:** métricas inspeccionables desde Grafana.
 
 <details>
-<summary><strong>Ver Kubernetes, PostgreSQL, Grafana y GitHub Actions</strong></summary>
+<summary><strong>Ver capturas técnicas de Kubernetes, SQL, Grafana y CI</strong></summary>
 
-**Kubernetes y HPA:** Pods en ejecución y configuración del autoescalamiento.
+**Kubernetes y HPA**
 
-![Pods de Kubernetes y Horizontal Pod Autoscaler](docs/images/kubernetes-hpa.png)
+![Pods y HPA de Kubernetes](docs/images/kubernetes-hpa.png)
 
-**PostgreSQL:** datos de pedidos consultados mediante SQL.
+**Datos en PostgreSQL**
 
-![Consulta SQL de pedidos en PostgreSQL](docs/images/postgresql.png)
+![Consulta SQL de pedidos](docs/images/postgresql.png)
 
-**Grafana:** métricas de réplicas, CPU y memoria.
+**Observabilidad en Grafana**
 
-![Dashboard de observabilidad en Grafana](docs/images/grafana.png)
+![Panel de métricas en Grafana](docs/images/grafana.png)
 
-**GitHub Actions:** workflows de pruebas y validación. Las pruebas de integración con PostgreSQL se ejecutaron correctamente.
+**Automatización en GitHub Actions**
 
-![Workflows de GitHub Actions](docs/images/github-actions.png)
+![Flujos de GitHub Actions](docs/images/github-actions.png)
 
 </details>
 
-## 🚀 Cómo abrir el dashboard local
+## ☁️ Kubernetes local vs. Google Cloud
 
-Con **Docker Desktop**, **Kind** y la aplicación **ya desplegada** en el clúster:
+| Entorno | Estado real |
+| --- | --- |
+| **Kubernetes en Kind** | **Desplegado y operativo localmente** con frontend, backend y PostgreSQL. |
+| **Google Kubernetes Engine (GKE)** | **Arquitectura definida en Terraform**: VPC, red privada, clúster, nodos e IAM. **No desplegado en GCP**. |
+| **CI en GitHub Actions** | **Ejecutado con éxito**, usando una instancia temporal de PostgreSQL para pruebas. |
+
+> El proyecto no tiene una demo web pública ni constituye experiencia de operación en GKE de producción. Su objetivo es acreditar implementación práctica de Kubernetes y diseño de infraestructura Cloud.
+
+## 🚀 Probar el dashboard localmente
+
+Con **Docker Desktop, Kind y los componentes ya desplegados**:
 
 ```powershell
 kubectl get pods -n secureops
 kubectl port-forward -n secureops service/secureops-frontend 8081:8080
 ```
 
-Abrir **http://localhost:8081** en el mismo equipo.
+Abrir **http://localhost:8081** en el mismo computador. Estos comandos **no instalan el proyecto desde cero**: una nueva instalación requiere construir/cargar las imágenes, aplicar los manifiestos y configurar el Secret de PostgreSQL.
 
-> Esta sección permite acceder a una instalación existente; **no instala el proyecto desde cero**. Una instalación nueva requiere construir/cargar las imágenes, aplicar los manifiestos y configurar el Secret de PostgreSQL.
+## 📁 Código e infraestructura
 
-## 📁 Dónde encontrar cada componente
+- [`apps/`](apps/) — frontend Nginx y API FastAPI.
+- [`k8s/`](k8s/) — manifiestos de Kubernetes, HPA y seguridad.
+- [`database/`](database/) — esquema de PostgreSQL y datos iniciales.
+- [`infra/terraform/`](infra/terraform/) — infraestructura objetivo de GKE en Google Cloud.
+- [`.github/workflows/`](.github/workflows/) — CI, pruebas y análisis automatizados.
+- [`scripts/`](scripts/) — scripts de respaldo y restauración.
 
-- [`apps/`](apps/) — frontend Nginx y backend FastAPI.
-- [`k8s/`](k8s/) — recursos Kubernetes y configuraciones de seguridad.
-- [`database/`](database/) — esquema SQL y datos iniciales.
-- [`infra/terraform/`](infra/terraform/) — arquitectura objetivo para Google Cloud.
-- [`.github/workflows/`](.github/workflows/) — pruebas, validaciones y análisis automatizados.
-- [`scripts/`](scripts/) — respaldo y restauración de PostgreSQL.
-
-**Enfoque del proyecto:** demostrar habilidades de **Cloud Engineer / DevSecOps** mediante una aplicación operativa en Kubernetes y un diseño de infraestructura GCP claramente diferenciado de lo desplegado.
+**Áreas profesionales representadas:** Cloud Engineering Junior, Kubernetes, infraestructura como código, DevOps y seguridad Cloud.
