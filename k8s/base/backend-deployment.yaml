@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: secureops-backend
@@ -22,10 +22,6 @@ spec:
     spec:
       serviceAccountName: secureops-backend-sa
       automountServiceAccountToken: false
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 10001
-        runAsGroup: 10001
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -64,6 +60,7 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+
 
 
 

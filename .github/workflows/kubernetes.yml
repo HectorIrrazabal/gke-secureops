@@ -1,0 +1,35 @@
+﻿name: SecureOps Kubernetes Validation
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-kubernetes:
+    name: Validate Kubernetes Manifests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Kubeconform
+        run: |
+          curl -fsSL -o kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz
+          tar -xzf kubeconform.tar.gz kubeconform
+          sudo install kubeconform /usr/local/bin/kubeconform
+
+      - name: Validate Kubernetes YAML
+        run: |
+          kubeconform -strict -summary \
+            -kubernetes-version 1.32.0 \
+            k8s/base/
