@@ -1,5 +1,6 @@
-from fastapi.testclient import TestClient
+﻿from unittest.mock import patch
 
+from fastapi.testclient import TestClient
 from app.main import app
 
 client = TestClient(app)
@@ -24,7 +25,30 @@ def test_version():
 
 
 def test_orders():
-    response = client.get("/api/orders")
+    mock_orders = [
+        {
+            "id": 1,
+            "product": "Laptop",
+            "quantity": 1,
+            "status": "pending",
+        },
+        {
+            "id": 2,
+            "product": "Keyboard",
+            "quantity": 1,
+            "status": "completed",
+        },
+        {
+            "id": 3,
+            "product": "Monitor",
+            "quantity": 1,
+            "status": "processing",
+        },
+    ]
+
+    with patch("app.main.fetch_orders", return_value=mock_orders):
+        response = client.get("/api/orders")
+
     assert response.status_code == 200
 
     data = response.json()

@@ -1,4 +1,4 @@
-﻿apiVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: secureops-backend
@@ -36,8 +36,11 @@ spec:
             capabilities:
               drop:
                 - ALL
-          image: gke-secureops-backend:1.0.2-multistage
+          image: gke-secureops-backend:1.2.0-crud
           imagePullPolicy: Never
+          envFrom:
+            - secretRef:
+                name: secureops-postgres-auth
           ports:
             - name: http
               containerPort: 8000
@@ -60,8 +63,3 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
-
-
-
-
-

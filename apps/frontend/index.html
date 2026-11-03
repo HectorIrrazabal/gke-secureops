@@ -3,111 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GKE SecureOps</title>
+  <title>SecureOps | Order Management</title>
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      margin: 0;
-      background: #f3f6fb;
-      color: #172b4d;
+    :root {
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #e8edf7;
+      background: #0b1120;
+      font-synthesis: none;
     }
-    main {
-      max-width: 800px;
-      margin: 48px auto;
-      padding: 24px;
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .layout { display: flex; min-height: 100vh; }
+    aside {
+      width: 225px;
+      padding: 30px 18px;
+      background: #101a2d;
+      border-right: 1px solid #263247;
     }
-    header, .panel {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 12px #0000000d;
+    .brand { font-size: 23px; font-weight: 800; letter-spacing: -.7px; }
+    .brand span { color: #65d6b2; }
+    .nav {
+      margin-top: 38px; padding: 13px;
+      border-radius: 10px; background: #20364b;
+      color: #8ee6ca; font-weight: 600;
     }
-    h1 { margin-top: 0; }
-    .status { font-weight: 600; color: #147d54; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
+    .aside-note { margin-top: 35px; color: #8b9bb4; font-size: 13px; line-height: 1.8; }
+    main { flex: 1; min-width: 0; padding: 36px; max-width: 1500px; margin: auto; }
+    header { display: flex; justify-content: space-between; gap: 15px; align-items: center; }
+    h1 { font-size: 29px; margin: 0 0 9px; }
+    h2 { font-size: 18px; margin: 0 0 18px; }
+    .muted { color: #99a8bf; font-size: 14px; }
+    .status {
+      background: #14372f; color: #7eebbc;
+      border: 1px solid #2c6f55;
+      padding: 9px 13px; border-radius: 50px; font-size: 13px;
     }
-    button {
-      background: #2563eb;
-      color: white;
-      border: 0;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
+    .status.offline { background: #43222b; color: #ff9aa9; border-color: #824252; }
+    .stats {
+      display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 16px; margin: 28px 0;
+    }
+    .card, .panel {
+      border: 1px solid #27344b;
+      background: #151f31;
+      border-radius: 15px;
+    }
+    .card { padding: 21px; }
+    .card .value { font-size: 32px; font-weight: 800; margin-top: 10px; }
+    .content { display: grid; grid-template-columns: minmax(0,2fr) minmax(270px,1fr); gap: 20px; }
+    .panel { padding: 24px; min-width: 0; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      color: #9eacc1; font-size: 12px; text-transform: uppercase;
+      letter-spacing: .07em; font-weight: 600;
+    }
+    th, td { padding: 15px 9px; border-bottom: 1px solid #2a364b; }
+    td { font-size: 14px; }
+    .badge { padding: 6px 9px; border-radius: 7px; font-size: 12px; white-space: nowrap; }
+    .pending { background: #493a20; color: #ffcf7e; }
+    .processing { background: #1d3e5d; color: #8fcbff; }
+    .completed { background: #1d493c; color: #91f0c4; }
+    .cancelled { background: #4a2630; color: #ff9baa; }
+    .field { margin: 17px 0; }
+    label { display: block; margin-bottom: 8px; font-size: 13px; color: #bdc9da; }
+    input, select {
+      width: 100%; border: 1px solid #35455c;
+      background: #0e1829; color: #f0f4ff;
+      padding: 12px; border-radius: 9px; outline: none;
+    }
+    input:focus, select:focus { border-color: #65d6b2; }
+    .btn {
+      border: 0; padding: 10px 14px; border-radius: 9px;
+      background: #55c9a4; color: #09251b; font-weight: 700;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn-secondary { background: #293b54; color: #e1ebfa; }
+    .btn-danger { background: #4c2732; color: #ffadbc; }
+    .btn-small { padding: 7px 9px; font-size: 12px; }
+    .full { width: 100%; }
+    .actions { display: flex; align-items: center; gap: 7px; }
+    .actions select { min-width: 125px; padding: 7px; font-size: 12px; }
+    .message { margin-top: 16px; min-height: 24px; color: #7fe3b9; font-size: 13px; }
+    .error { color: #ff9baa; }
+    .footer { margin-top: 30px; color: #788ca9; font-size: 12px; }
+    @media(max-width:1050px) {
+      .content { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2,1fr); }
+    }
+    @media(max-width:650px) {
+      aside { display: none; }
+      main { padding: 20px 13px; }
+      header { align-items: flex-start; }
+      h1 { font-size: 24px; }
+      .panel { padding: 17px 11px; }
+      .stats { gap: 9px; }
+      .card { padding: 14px; }
+      .actions { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
 <body>
+<div class="layout">
+  <aside>
+    <div class="brand">Secure<span>Ops</span></div>
+    <div class="nav">▦ &nbsp; Pedidos</div>
+    <div class="aside-note">
+      CLOUD ENGINEERING LAB<br>
+      Kubernetes / Kind<br>
+      FastAPI / PostgreSQL<br>
+      Docker / Observabilidad
+    </div>
+  </aside>
+
   <main>
     <header>
-      <h1>GKE SecureOps</h1>
-      <p>Secure Kubernetes Platform</p>
-      <p>Backend: <span id="status">Consultando...</span></p>
-      <p>Version API: <span id="version">-</span></p>
-      <button onclick="loadOrders()">Actualizar pedidos</button>
+      <div>
+        <h1>Gestión de pedidos</h1>
+        <div class="muted">Dashboard operativo conectado a PostgreSQL</div>
+      </div>
+      <span class="status" id="connection">● Comprobando API...</span>
     </header>
 
-    <section class="panel">
-      <h2>Pedidos</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody id="orders"></tbody>
-      </table>
+    <section class="stats">
+      <div class="card"><div class="muted">Total pedidos</div><div class="value" id="total">—</div></div>
+      <div class="card"><div class="muted">Pendientes</div><div class="value" id="pending">—</div></div>
+      <div class="card"><div class="muted">En proceso</div><div class="value" id="processing">—</div></div>
+      <div class="card"><div class="muted">Completados</div><div class="value" id="completed">—</div></div>
     </section>
+
+    <section class="content">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Pedidos registrados</h2>
+          <button type="button" class="btn btn-secondary" id="refresh">Actualizar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="orders">
+              <tr><td colspan="5">Cargando pedidos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="table-message" class="message" role="status"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Nuevo pedido</h2>
+        <div class="muted">Registra un pedido directamente en PostgreSQL.</div>
+        <form id="order-form">
+          <div class="field">
+            <label for="product">Producto</label>
+            <select id="product" required>
+              <option value="1">Laptop</option>
+              <option value="2">Keyboard</option>
+              <option value="3">Monitor</option>
+              <option value="4">Mouse</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="quantity">Cantidad</label>
+            <input id="quantity" type="number" min="1" max="1000" value="1" required>
+          </div>
+          <button class="btn full" id="create" type="submit">+ Crear pedido</button>
+        </form>
+        <div id="form-message" class="message" role="status"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      GKE SecureOps · Kubernetes · FastAPI REST · PostgreSQL · Entorno local Kind
+    </div>
   </main>
+</div>
 
-  <script>
-    async function loadOrders() {
-      const status = document.getElementById("status");
-      const tbody = document.getElementById("orders");
-      status.textContent = "Consultando...";
-      tbody.replaceChildren();
+<script>
+  const API = "/api/orders";
+  const labels = {
+    pending: "Pendiente",
+    processing: "En proceso",
+    completed: "Completado",
+    cancelled: "Cancelado"
+  };
 
-      try {
-        const response = await fetch("/api/orders", {
-          cache: "no-store"
-        });
+  const tbody = document.getElementById("orders");
+  const connection = document.getElementById("connection");
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+  function showMessage(id, text, isError = false) {
+    const element = document.getElementById(id);
+    element.textContent = text;
+    element.className = "message" + (isError ? " error" : "");
+  }
 
-        const data = await response.json();
-        document.getElementById("version").textContent =
-          data.version;
-        status.textContent = "Conectado";
-        status.className = "status";
-
-        data.orders.forEach(order => {
-          const row = document.createElement("tr");
-
-          [order.id, order.product, order.status].forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = String(value);
-            row.appendChild(cell);
-          });
-
-          tbody.appendChild(row);
-        });
-      } catch (error) {
-        status.textContent = "Error de conexion";
-        status.className = "";
-        document.getElementById("version").textContent = "-";
-        console.error(error);
+  async function request(url, options = {}) {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
       }
-    }
+    });
 
-    loadOrders();
-  </script>
+    if (!response.ok) {
+      let reason = `HTTP ${response.status}`;
+      try {
+        const data = await response.json();
+        if (typeof data.detail === "string") reason = data.detail;
+      } catch (_) {}
+      throw new Error(reason);
+    }
+    return response.json();
+  }
+
+  function cell(row, text) {
+    const td = document.createElement("td");
+    td.textContent = String(text);
+    row.appendChild(td);
+    return td;
+  }
+
+  function renderOrder(order) {
+    const tr = document.createElement("tr");
+    cell(tr, "#" + order.id);
+    cell(tr, order.product);
+    cell(tr, order.quantity);
+
+    const statusCell = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "badge " + order.status;
+    badge.textContent = labels[order.status] || order.status;
+    statusCell.appendChild(badge);
+    tr.appendChild(statusCell);
+
+    const actionCell = document.createElement("td");
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", "Estado pedido " + order.id);
+    for (const [value, label] of Object.entries(labels)) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      select.appendChild(option);
+    }
+    select.value = order.status;
+
+    select.addEventListener("change", async () => {
+      select.disabled = true;
+      try {
+        await request(`${API}/${order.id}`, {
+          method: "PATCH",
+          body: JSON.stringify({status: select.value})
+        });
+        showMessage("table-message", `Pedido #${order.id} actualizado.`);
+        await loadOrders();
+      } catch (error) {
+        showMessage("table-message", error.message, true);
+        select.value = order.status;
+      } finally {
+        select.disabled = false;
+      }
+    });
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "btn btn-danger btn-small";
+    remove.textContent = "Eliminar";
+    remove.setAttribute("aria-label", "Eliminar pedido " + order.id);
+
+    remove.addEventListener("click", async () => {
+      if (!confirm(`¿Eliminar el pedido #${order.id}?`)) return;
+      remove.disabled = true;
+      try {
+        await request(`${API}/${order.id}`, {method: "DELETE"});
+        showMessage("table-message", `Pedido #${order.id} eliminado.`);
+        await loadOrders();
+      } catch (error) {
+        showMessage("table-message", error.message, true);
+        remove.disabled = false;
+      }
+    });
+
+    actions.append(select, remove);
+    actionCell.appendChild(actions);
+    tr.appendChild(actionCell);
+    return tr;
+  }
+
+  async function loadOrders() {
+    try {
+      const data = await request(API);
+      const orders = data.orders || [];
+
+      tbody.replaceChildren();
+      if (orders.length === 0) {
+        const tr = document.createElement("tr");
+        const td = cell(tr, "No hay pedidos registrados.");
+        td.colSpan = 5;
+        tbody.appendChild(tr);
+      } else {
+        orders.forEach(order => tbody.appendChild(renderOrder(order)));
+      }
+
+      document.getElementById("total").textContent = orders.length;
+      for (const status of ["pending", "processing", "completed"]) {
+        document.getElementById(status).textContent =
+          orders.filter(order => order.status === status).length;
+      }
+
+      connection.textContent = "● API conectada";
+      connection.className = "status";
+    } catch (error) {
+      connection.textContent = "● Error de conexión";
+      connection.className = "status offline";
+      showMessage("table-message", "No se pudieron cargar pedidos: " + error.message, true);
+      tbody.replaceChildren();
+      const tr = document.createElement("tr");
+      const td = cell(tr, "No fue posible consultar la API.");
+      td.colSpan = 5;
+      tbody.appendChild(tr);
+    }
+  }
+
+  document.getElementById("refresh").addEventListener("click", loadOrders);
+
+  document.getElementById("order-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = document.getElementById("create");
+    button.disabled = true;
+    try {
+      const product_id = Number(document.getElementById("product").value);
+      const quantity = Number(document.getElementById("quantity").value);
+
+      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 1000) {
+        throw new Error("La cantidad debe estar entre 1 y 1000.");
+      }
+
+      const created = await request(API, {
+        method: "POST",
+        body: JSON.stringify({product_id, quantity})
+      });
+
+      showMessage("form-message", `Pedido #${created.id} creado correctamente.`);
+      document.getElementById("quantity").value = 1;
+      await loadOrders();
+    } catch (error) {
+      showMessage("form-message", error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  loadOrders();
+</script>
 </body>
 </html>
