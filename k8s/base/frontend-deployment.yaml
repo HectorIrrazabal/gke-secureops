@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: secureops-frontend
@@ -32,9 +32,15 @@ spec:
               containerPort: 8080
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: nginx-tmp
+              mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
           resources:
             requests:
               cpu: "25m"
@@ -54,3 +60,9 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+
+      volumes:
+        - name: nginx-tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
