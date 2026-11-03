@@ -70,3 +70,13 @@ Abrir **http://localhost:8081**.
 - **Preparado para Google Cloud:** infraestructura de GKE descrita en Terraform y manifiestos de adaptación. **GKE no está desplegado**.
 
 **Objetivo:** un proyecto de portafolio reproducible para roles **Cloud Engineer / DevSecOps**, mostrando tanto una aplicación funcional como las prácticas necesarias para operarla.
+
+## Backup & Recovery
+
+PostgreSQL cuenta con scripts PowerShell para respaldo y recuperación:
+
+- **Backup:** `pg_dump` genera respaldos SQL.
+- **Restore:** `pg_restore` recupera los datos en una base independiente.
+- **Prueba realizada:** recuperación exitosa de 7 pedidos sin modificar la base original.
+
+Los respaldos se almacenan en `backups/` y están excluidos de GitHub.

@@ -28,3 +28,6 @@ crash.log
 Thumbs.db
 
 **/.terraform/
+backups/
+firebase-debug.log
+apps/frontend/index.backup.html
