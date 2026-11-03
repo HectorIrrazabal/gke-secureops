@@ -23,3 +23,27 @@ server:
     limits:
       cpu: 500m
       memory: 512Mi
+
+serverFiles:
+  alerting_rules.yml:
+    groups:
+      - name: secureops-kubernetes
+        rules:
+          - alert: BackendReplicasUnavailable
+            expr: |
+              kube_deployment_spec_replicas{
+                namespace="secureops",
+                deployment="secureops-backend"
+              }
+              >
+              kube_deployment_status_replicas_available{
+                namespace="secureops",
+                deployment="secureops-backend"
+              }
+            for: 2m
+            labels:
+              severity: warning
+              service: backend
+            annotations:
+              summary: "Backend FastAPI con replicas insuficientes"
+              description: "El deployment secureops-backend tiene menos replicas disponibles que las deseadas durante 2 minutos."
