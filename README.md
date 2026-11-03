@@ -1,6 +1,5 @@
-# ☁️ GKE SecureOps — Kubernetes & Cloud Engineering
-
-**Proyecto de portafolio | Cloud Engineer Junior · Kubernetes · DevOps · Google Cloud (IaC)**
+# ☁️ k8s-secureops-platform
+**Proyecto de portafolio | k8s-secureops-platform**
 
 Plataforma de gestión de pedidos desplegada sobre **Kubernetes local (Kind)**, diseñada para demostrar habilidades prácticas de **orquestación, redes, seguridad, escalabilidad, observabilidad y automatización**. Incluye una **arquitectura objetivo de GKE privado en Google Cloud**, definida con Terraform y aún no desplegada.
 
